@@ -1,2 +1,2 @@
 ### CheatManager for Mac OS/UNIX
-### CheatManager for Windows
+### CheatManager.exe for Windows
