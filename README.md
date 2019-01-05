@@ -22,3 +22,7 @@ Lets you know when an application you're monitoring has received an update
 **Delete Key**:  Removes the selected application from the watch-list
 
 **Drag & Drop**: Drag & Drop the Bundle ID onto the grey box to add it to the watch-list
+
+## Preview
+
+![](https://i.imgur.com/qc0hZSG.gif)
