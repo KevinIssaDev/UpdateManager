@@ -154,8 +154,11 @@ class Ui_MainWindow(object):
         try:
             with open('data.json', 'r') as data_file:
                 data = json.load(data_file)
-        except json.decoder.JSONDecodeError:
-            copyfile('data.json', 'data.backup')
+        except:
+            try:
+                copyfile('data.json', 'data.backup')
+            except:
+                pass
             with open('data.json', 'w') as data_file:
                 data = {}
                 json.dump(data, data_file, indent = 4, sort_keys = True)
