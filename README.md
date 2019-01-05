@@ -1,9 +1,7 @@
 # CheatManager
 
 ## Features
-Keep track of your hacked apps
-
-Keep track of New Era iOSGods apps
+Lets you know when an application you're monitoring has received an update
 
 ## Help
 
