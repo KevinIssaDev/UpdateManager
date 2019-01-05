@@ -21,5 +21,7 @@ Keep track of New Era iOSGods apps
 ## Shortcuts
 
 **Enter/Return Key**: Adds the specified Bundle ID to the watch-list or updates the selected application
+
 **Delete Key**:  Removes the selected application from the watch-list
+
 **Drag & Drop**: Drag & Drop the Bundle ID onto the grey box to add it to the watch-list
