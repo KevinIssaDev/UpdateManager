@@ -1,4 +1,4 @@
-# CheatManager
+# UpdateManager
 
 Lets you know when an application you're monitoring has received an update
 
