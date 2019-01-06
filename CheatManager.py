@@ -54,11 +54,11 @@ class Ui_MainWindow(object):
         self.tableWidget.setGridStyle(QtCore.Qt.DotLine)
         self.tableWidget.setCornerButtonEnabled(False)
         self.tableWidget.setRowCount(5)
-        self.tableWidget.setColumnCount(4)
+        self.tableWidget.setColumnCount(5)
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.horizontalHeader().setVisible(True)
         self.tableWidget.verticalHeader().setVisible(False)
-        self.tableWidget.setHorizontalHeaderLabels(['Name', 'Bundle ID', 'Version', 'Status'])
+        self.tableWidget.setHorizontalHeaderLabels(['Name', 'Store', 'Bundle ID', 'Version', 'Status'])
         #self.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         header = self.tableWidget.horizontalHeader()
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
@@ -67,6 +67,8 @@ class Ui_MainWindow(object):
         header.setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)
         self.btnLoad = QtWidgets.QPushButton(self.centralwidget)
         self.btnLoad.setGeometry(QtCore.QRect(630, 250, 81, 31))
+        self.countryList = QtWidgets.QComboBox(self.centralwidget)
+        self.countryList.setGeometry(QtCore.QRect(180, 280, 141, 31))
         font = QtGui.QFont()
         font.setFamily("Roboto")
         font.setPointSize(9)
@@ -118,9 +120,9 @@ class Ui_MainWindow(object):
         self.updateBtn.setObjectName("updateBtn")
         MainWindow.setCentralWidget(self.centralwidget)
 
-        self.rightTopFrame = QtWidgets.QFrame(self.centralwidget)
-        self.rightTopFrame.setGeometry(QtCore.QRect(180, 250, 141, 22))
-        self.rightTopFrame.setStyleSheet("background-color: #DCDCDC; border-radius: 3px; border: 1px solid #ababab")
+        self.dragDropBox = QtWidgets.QFrame(self.centralwidget)
+        self.dragDropBox.setGeometry(QtCore.QRect(180, 250, 141, 22))
+        self.dragDropBox.setStyleSheet("background-color: #DCDCDC; border-radius: 3px; border: 1px solid #ababab")
 
         self.label = DropLabel("", self.centralwidget)
         self.label.move(180, 250)
@@ -135,18 +137,43 @@ class Ui_MainWindow(object):
         self.lineEdit.returnPressed.connect(self.on_enter_do)
         self.removeBtn.clicked.connect(lambda: remove_entry(self.lineEdit.text()))
         self.updateBtn.clicked.connect(lambda: update_entry(self.lineEdit.text()))
+        self.countryList.activated.connect(self.manage_country)
         self.tableWidget.keyPressEvent = self.del_entry
 
 
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "CheatManager"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "UpdateManager"))
         self.tableWidget.setSortingEnabled(True)
         self.btnLoad.setText(_translate("MainWindow", "Refresh"))
         self.pushButton.setText(_translate("MainWindow", "Add"))
         self.removeBtn.setText(_translate("MainWindow", "Remove"))
         self.updateBtn.setText(_translate("MainWindow", "Update"))
+
+
+    def load_countries(self):
+        countries = [['Albania', 'AL'], ['Australia', 'AU'], ['Austria', 'AT'], ['Belgium', 'BE'], ['Brazil', 'BR'], ['Canada', 'CA'],
+                    ['China', 'CN'], ['Denmark', 'DK'], ['Dominican Republic', 'DO'], ['Egypt', 'EG'], ['Finland', 'FI'], ['France', 'FR'],
+                    ['Germany', 'DE'], ['Greece', 'GR'], ['Hong Kong', 'HK'], ['India', 'IN'], ['Indonesia', 'ID'], ['Ireland', 'IE'], ['Italy', 'IT'],
+                    ['Japan', 'JP'], ['South Korea', 'KR'], ['Luxembourg', 'LU'], ['Macedonia', 'MK'], ['Malaysia', 'MY'], ['Mexico', 'MX'],
+                    ['Netherlands', 'NL'], ['New Zealand', 'NZ'], ['North Korea', 'KP'], ['Norway', 'NO'], ['Pakistan', 'PK'], ['Philippines', 'PH'],
+                    ['Romania', 'RO'], ['Russian', 'RU'], ['Saudi Arabia', 'SA'], ['Serbia', 'RS'], ['Singapore', 'SG'], ['South Africa', 'ZA'],
+                    ['Sweden', 'SE'], ['Switzerland', 'CH'], ['Taiwan', 'TW'], ['Turkey', 'TR'], ['United Kingdom', 'GB'], ['United States', 'US'], ['Vietnam', 'VN']]
+
+        country_dict = {}
+
+        for country in countries:
+            self.countryList.addItem(country[0], country[1])
+            country_dict[country[1].lower()] = country[0]
+
+        self.countryList.setCurrentIndex(42)
+        return country_dict
+
+    def manage_country(self, index):
+        global info_url
+        info_url = "http://itunes.apple.com/" + self.countryList.itemData(index).lower() + "/lookup?bundleId="
+
 
     def load_entries(self):
         global data
@@ -163,19 +190,20 @@ class Ui_MainWindow(object):
                 data = {}
                 json.dump(data, data_file, indent = 4, sort_keys = True)
         for rowN, rowD in enumerate(data):
-            if fetch_version(rowD) != data[rowD]['version']:
+            if fetch_version(rowD, data[rowD]['store']) != data[rowD]['version']:
                 status = "Outdated"
             else:
                 status = "Up to Date"
             self.tableWidget.insertRow(rowN)
             self.tableWidget.setItem(rowN, 0, QtWidgets.QTableWidgetItem(data[rowD]['name']))
-            self.tableWidget.setItem(rowN, 2, QtWidgets.QTableWidgetItem(data[rowD]['version']))
-            self.tableWidget.setItem(rowN, 1, QtWidgets.QTableWidgetItem(rowD))
-            self.tableWidget.setItem(rowN, 3, QtWidgets.QTableWidgetItem(status))
+            self.tableWidget.setItem(rowN, 1, QtWidgets.QTableWidgetItem(country_dict[data[rowD]['store']]))
+            self.tableWidget.setItem(rowN, 3, QtWidgets.QTableWidgetItem(data[rowD]['version']))
+            self.tableWidget.setItem(rowN, 2, QtWidgets.QTableWidgetItem(rowD))
+            self.tableWidget.setItem(rowN, 4, QtWidgets.QTableWidgetItem(status))
             if status == "Outdated":
-                self.tableWidget.item(rowN, 3).setBackground(QtGui.QColor(255,0,0))
+                self.tableWidget.item(rowN, 4).setBackground(QtGui.QColor(255,0,0))
             else:
-                self.tableWidget.item(rowN, 3).setBackground(QtGui.QColor(50,205,50))
+                self.tableWidget.item(rowN, 4).setBackground(QtGui.QColor(50,205,50))
 
     def add(self):
         txt = self.lineEdit.text()
@@ -211,7 +239,7 @@ class DropLabel(QtWidgets.QLabel):
 
 def selected_row():
     row = ui.tableWidget.currentRow()
-    firstColumnInRow = ui.tableWidget.item(row, 1)
+    firstColumnInRow = ui.tableWidget.item(row, 2)
     try:
         text = firstColumnInRow.text()
     except:
@@ -232,22 +260,23 @@ def fetch_info(bundle_id):
         bundle_id = bundle_id.strip()
     except:
         pass
-    info_url = "http://itunes.apple.com/lookup?bundleId="
     info = requests.get(info_url + bundle_id).json()
     if is_bundle_id(info, None):
         data[bundle_id] = {
                             "name": info['results'][0]['trackName'],
-                            "version": info['results'][0]['version']
+                            "version": info['results'][0]['version'],
+                            "store": ui.countryList.itemData(ui.countryList.currentIndex()).lower()
                             }
         ui.lineEdit.setText('')
     dump_info()
     ui.load_entries()
 
-def fetch_version(bundle_id):
+def fetch_version(bundle_id, store):
     try:
         bundle_id = bundle_id.strip()
     except:
         pass
+    info_url = "http://itunes.apple.com/" + store + "/lookup?bundleId="
     info = requests.get(info_url + bundle_id).json()
     return info['results'][0]['version']
 
@@ -286,7 +315,7 @@ def update_entry(bundle_id):
         pass
     if is_bundle_id(None, bundle_id):
         try:
-            data[bundle_id]['version'] = fetch_version(bundle_id)
+            data[bundle_id]['version'] = fetch_version(bundle_id, data[bundle_id]['store'])
             ui.lineEdit.setText('')
             dump_info()
             ui.load_entries()
@@ -326,5 +355,6 @@ MainWindow = QtWidgets.QMainWindow()
 ui = Ui_MainWindow()
 ui.setupUi(MainWindow)
 MainWindow.show()
+country_dict = ui.load_countries()
 ui.load_entries()
 sys.exit(app.exec_())
