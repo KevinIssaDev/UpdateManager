@@ -1,3 +1,2 @@
-### CheatManager for Mac OS/UNIX
-### CheatManager.exe for Windows
-##### Will be renamed to UpdateManager
+### UpdateManager for Mac OS/UNIX
+### UpdateManager.exe for Windows
