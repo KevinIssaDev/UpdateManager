@@ -1,4 +1,4 @@
-# UpdateManager
+# UpdateManager-GUI
 
 Lets you know when an application you're monitoring has received an update
 
